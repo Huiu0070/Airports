@@ -189,10 +189,12 @@ def MapFlights(aircrafts):
         origin_lat = 0.0
         origin_lon = 0.0
         i = 0
-        while i < len(airports):
+        Found = False
+        while i < len(airports) and not Found:
             if airports[i].code == a.origin:
                 origin_lat = airports[i].latitude
                 origin_lon = airports[i].longitude
+                Found = True
             i = i+1
 
         #Dibujar la línea
