@@ -193,7 +193,7 @@ root.configure(bg="white")
 root.resizable(False, True)
 
 #Estil botons
-BTN = {"bg": "blue", "fg": "white", "relief": "flat",
+BTN = {"bg": "royalblue", "fg": "white", "relief": "flat",
        "padx": 6, "pady": 5, "width": 17, "font": ("Helvetica", 9),
        "activebackground": "navy", "activeforeground": "white"}
 
@@ -254,7 +254,7 @@ a_scroll = tk.Scrollbar(frame_alist)
 a_scroll.pack(side="right", fill="y")
 
 airport_listbox = tk.Listbox(frame_alist, width=68, height=9, font=("Courier", 9),
-                              bg="white", fg="black", selectbackground="blue",
+                              bg="white", fg="black", selectbackground="royalblue",
                               relief="solid", bd=1, yscrollcommand=a_scroll.set)
 airport_listbox.pack(side="left")
 a_scroll.config(command=airport_listbox.yview)
@@ -296,7 +296,7 @@ f_scroll = tk.Scrollbar(frame_flist)
 f_scroll.pack(side="right", fill="y")
 
 flights_listbox = tk.Listbox(frame_flist, width=68, height=9, font=("Courier", 9),
-                              bg="white", fg="black", selectbackground="blue",
+                              bg="white", fg="black", selectbackground="royalblue",
                               relief="solid", bd=1, yscrollcommand=f_scroll.set)
 flights_listbox.pack(side="left")
 f_scroll.config(command=flights_listbox.yview)
@@ -308,11 +308,10 @@ status_label = tk.Label(root, bg="white", font=("Courier", 9), fg="gray", anchor
                          text="  ✈ Airports: 0  |  Schengen: 0  Non-Schengen: 0  |  Flights: 0")
 status_label.pack(fill="x", padx=0, pady=6)
 
-#Credits
-tk.Frame(root, bg="gray", height=1).pack(fill="x", padx=20, pady=(12, 0))
+tk.Frame(root, bg="gray", height=1).pack(fill="x", padx=20)
 
-status_label = tk.Label(root, bg="white", fg="gray", anchor="w",
-                         text="       Project by: Tejdeep, Xavi, Guiu")
-status_label.pack(fill="x", padx=0, pady=6)
+tk.Label(root, text=" Project by: Guiu  ·  Tejdeep  ·  Xavi", bg="white",
+          fg="royalblue").pack(pady=6)
+
 
 root.mainloop()

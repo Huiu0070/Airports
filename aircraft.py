@@ -36,7 +36,7 @@ def PlotArrivals(aircrafts):
     import matplotlib.pyplot as plt
 
     if len(aircrafts)==0:
-        print('Error:lista vacía.')
+        print('Error: lista vacía.')
         return
 
     horas = [0]*24
