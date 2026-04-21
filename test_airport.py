@@ -10,23 +10,23 @@ from airports import *
 # Mira que tot funcioni bé
 airport = Airport ("LEBL", 41.297445, 2.0832941)
 SetSchengen(airport)
-print('Prueba:')
+print('Proba:')
 PrintAirport (airport)
 
 print()
 
 # Carrega aeroports de Airports.txt
 airports = LoadAirport("Airports.txt")
-print(f"Aeropuertos cargados: {len(airports)}")
+print(f"Aeroports carregats: {len(airports)}")
 
 # Crea nou fitxer amb els aeroports schengen
 SaveSchengenAirports(airports, "schengen_output.txt")
-print("Archivo 'schengen_output.txt' guardado.")
+print("Arxiu 'schengen_output.txt' guardat.")
 
 # Crea la grafica
 PlotAirports(airports)
-print('Grafica creada')
+print('Gràfica creada')
 
 # Crea fitxer per google earth
 MapAirports(airports)
-print("Archivo 'airports.kml' creado. Ábrelo con Google Earth.")
+print("Arxiu 'airports.kml' creat.. Obre amb  Google Earth.")

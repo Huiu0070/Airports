@@ -3,15 +3,13 @@ from tkinter import filedialog, messagebox
 import matplotlib
 matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt
-from collections import Counter
-from airports import *
 from aircraft import *
 
 airports = []
 aircrafts = []
 
 
-# ── Funcions auxiliars UI ─────────────────────────────────────────
+#Funcions auxiliars UI
 
 def update_status():
     n_airp = len(airports)
@@ -25,7 +23,7 @@ def update_status():
     )
 
 
-# ── Funcions Aeroports ────────────────────────────────────────────
+#Funcions Aeroports
 
 def refresh_airport_list():
     airport_listbox.delete(0, tk.END)
@@ -111,7 +109,7 @@ def map_airports():
         messagebox.showinfo("Done", "Map saved successfully.")
 
 
-# ── Funcions Vols ─────────────────────────────────────────────────
+#Funcions Vols
 
 def refresh_flights_list():
     flights_listbox.delete(0, tk.END)
@@ -186,9 +184,7 @@ def long_distance():
     MapFlights(long)
 
 
-# ══════════════════════════════════════════════════════════════════
-# ── Finestra principal
-# ══════════════════════════════════════════════════════════════════
+#Finestra principal
 
 root = tk.Tk()
 root.title("Airport Manager")
@@ -196,18 +192,18 @@ root.geometry("640x1000")
 root.configure(bg="white")
 root.resizable(False, True)
 
-# ── Estil botons: tot blau, sense codis hex ───────────────────────
+#Estil botons
 BTN = {"bg": "blue", "fg": "white", "relief": "flat",
        "padx": 6, "pady": 5, "width": 17, "font": ("Helvetica", 9),
        "activebackground": "navy", "activeforeground": "white"}
 
-# ── Títol ─────────────────────────────────────────────────────────
+#Títol
 tk.Label(root, text="✈  Airport Manager", bg="white",
          font=("Helvetica", 18, "bold"), fg="black").pack(pady=(14, 4))
 
 tk.Frame(root, bg="gray", height=1).pack(fill="x", padx=20)
 
-# ══ Secció AIRPORTS ═══════════════════════════════════════════════
+#Secció AIRPORTS
 tk.Label(root, text="AIRPORTS", bg="white",
          font=("Helvetica", 10, "bold"), fg="gray").pack(anchor="w", padx=22, pady=(10, 2))
 
@@ -263,10 +259,10 @@ airport_listbox = tk.Listbox(frame_alist, width=68, height=9, font=("Courier", 9
 airport_listbox.pack(side="left")
 a_scroll.config(command=airport_listbox.yview)
 
-# ── Separador ─────────────────────────────────────────────────────
+#Separador
 tk.Frame(root, bg="gray", height=1).pack(fill="x", padx=20, pady=(12, 0))
 
-# ══ Secció FLIGHTS ════════════════════════════════════════════════
+# Secció FLIGHTS
 tk.Label(root, text="FLIGHTS", bg="white",
          font=("Helvetica", 10, "bold"), fg="gray").pack(anchor="w", padx=22, pady=(8, 4))
 
@@ -305,11 +301,18 @@ flights_listbox = tk.Listbox(frame_flist, width=68, height=9, font=("Courier", 9
 flights_listbox.pack(side="left")
 f_scroll.config(command=flights_listbox.yview)
 
-# ── Barra d'estat ─────────────────────────────────────────────────
+# Barra d'estat
 tk.Frame(root, bg="gray", height=1).pack(fill="x", padx=20, pady=(12, 0))
 
 status_label = tk.Label(root, bg="white", font=("Courier", 9), fg="gray", anchor="w",
                          text="  ✈ Airports: 0  |  Schengen: 0  Non-Schengen: 0  |  Flights: 0")
+status_label.pack(fill="x", padx=0, pady=6)
+
+#Credits
+tk.Frame(root, bg="gray", height=1).pack(fill="x", padx=20, pady=(12, 0))
+
+status_label = tk.Label(root, bg="white", fg="gray", anchor="w",
+                         text="       Project by: Tejdeep, Xavi, Guiu")
 status_label.pack(fill="x", padx=0, pady=6)
 
 root.mainloop()

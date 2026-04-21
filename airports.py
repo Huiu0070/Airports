@@ -7,7 +7,7 @@ class Airport:
         self.longitude = longitude
         self.isSchengen = False
 
-# Mira si l'aeroport es Schengen
+# Mira si l'aeroport és Schengen
 def IsSchengenAirport(code):
     if not code or len(code)<2:
         return False
@@ -18,7 +18,7 @@ def IsSchengenAirport(code):
     else:
         return False
 
-# Rep si es schengen o no i diu si es true o false
+# Rep si és schengen o no i diu si és true o false
 def SetSchengen(airport):
     result=IsSchengenAirport(airport.code)
     if result == True:
@@ -28,8 +28,8 @@ def SetSchengen(airport):
 
 # Fica en la consola aeroport
 def PrintAirport(airport):
-    print("Datos del Aeropuerto:")
-    print("Código ICAO:", airport.code)
+    print("Dades de l'aeroport:")
+    print("Codi ICAO:", airport.code)
     print("Latitude:", airport.latitude)
     print("Longitude:", airport.longitude)
     print("Schengen:", airport.isSchengen)
@@ -51,13 +51,13 @@ def LoadAirport(archivo_entrada):
 
                 #Convertir latitud
                 lat=elementos[1]
-                #Extraer los trozos
+                #Extraure els trossos
                 lat_grados=float(lat[1:3])
                 lat_min=float(lat[3:5])
                 lat_seg=float(lat[5:7])
 
                 lat_decimal=lat_grados+lat_min/60+lat_seg/3600
-                if lat[0]=="S":           #Si es sud la latitud es negativa
+                if lat[0]=="S":           #Si és sud la latitud és negativa
                     lat_decimal=-lat_decimal
 
                 #Convertir longitud
@@ -68,7 +68,7 @@ def LoadAirport(archivo_entrada):
                 lon_seg=float(lon[6:8])
 
                 lon_decimal=lon_grados+lon_min/60+lon_seg/3600
-                if lon[0]=="W":       #Si es oest (west) la longitud es negativa
+                if lon[0]=="W":       #Si és oest (west) la longitud és negativa
                     lon_decimal=-lon_decimal
 
                     #Crear aeroport
@@ -85,7 +85,7 @@ def LoadAirport(archivo_entrada):
         F.close()
 
     except FileNotFoundError:
-        print("Error: archivo no encontrado")
+        print("Error: arxiu no trobat.")
 
 
     return airports_list
@@ -104,7 +104,7 @@ def SaveSchengenAirports(airports, archivo_salida):
         F.close()
 
     except:
-        print("Error al guardar el archivo")
+        print("Error al guardar l'arxiu.")
 
 
 # Fa la grafica dels aeroports

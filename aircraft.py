@@ -51,14 +51,14 @@ def PlotArrivals(aircrafts):
 
     plt.bar(range(24),horas)
     plt.xlabel('Hora')
-    plt.ylabel('Vuelos')
-    plt.title('Llegadas por hora')
+    plt.ylabel('Vols')
+    plt.title('Arribades per hora')
     plt.show()
 
 
 def SaveFlights(aircrafts, filename):
     if len(aircrafts)==0:
-        print('Error: lista vacía.')
+        print('Error: llista buida.')
         return
 
     f = open(filename, "w")
@@ -75,7 +75,7 @@ def PlotAirlines(aircrafts):
     import matplotlib.pyplot as plt
 
     if len(aircrafts)==0:
-        print('Error: lista vacía.')
+        print('Error: llista buida.')
         return
 
     companies = []
@@ -129,7 +129,7 @@ def PlotFlightsType(aircrafts):
     import matplotlib.pyplot as plt
 
     if len(aircrafts)==0:
-        print('Error: lista vacía.')
+        print('Error: llista buida.')
         return
 
     Schengen = 0
@@ -146,8 +146,8 @@ def PlotFlightsType(aircrafts):
 
     plt.bar(0, Schengen, color='blue', label='Schengen')
     plt.bar(0, NoSchengen, bottom=Schengen, color='red', label='No Schengen')
-    plt.title('Vuelos Schengen vs No Schengen')
-    plt.ylabel('Vuelos')
+    plt.title('Vols Schengen vs No Schengen')
+    plt.ylabel('Vols')
     plt.xticks([])
     plt.legend()
     plt.show()
@@ -224,7 +224,7 @@ def Haversine(lat1, lon1, lat2, lon2):
 
     r = 6371 #Radio Tierra en km
 
-    #Convertir a radianes
+    #Convertir a rad
     lat1 = lat1*math.pi/180
     lon1 = lon1*math.pi/180
     lat2 = lat2*math.pi/180
@@ -238,7 +238,7 @@ def Haversine(lat1, lon1, lat2, lon2):
     return r * c
 
 def LongDistanceArrivals(aircrafts):
-    #Coordenadas LEBL
+    #Coordenadas LEBL (BCN)
     lebl_lat = 41.29694
     lebl_lon = 2.07833
 
@@ -249,7 +249,7 @@ def LongDistanceArrivals(aircrafts):
     while num < len(aircrafts):
         a = aircrafts[num]
 
-        #Buscar coordenadas del aeropuerto origen
+        #Buscar coordenadas d'aeroport d'origen'
         i=0
         while i < len(airports):
             if airports[i].code == a.origin:
@@ -264,17 +264,17 @@ def LongDistanceArrivals(aircrafts):
 
 
 
-#TEST SECTION
+#TEST
 if __name__ == '__main__':
     aircrafts = LoadArrivals('Arrivals.txt')
-    print('Vuelos cargados:', len(aircrafts))
+    print('Vols carregats:', len(aircrafts))
 
     print('TEST PLOT ARRIVALS')
     PlotArrivals(aircrafts)
 
     print('TEST SAVE FLIGHTS')
     SaveFlights(aircrafts, 'arrivals_output.txt')
-    print('Fichero guardado correctamente.')
+    print('Fitxer guardat correctament.')
 
     print('TEST PLOT AIRLINES')
     PlotAirlines(aircrafts)
@@ -284,8 +284,8 @@ if __name__ == '__main__':
 
     print('TEST MAP FLIGHTS')
     MapFlights(aircrafts)
-    print('Fichero KML generado correctamente.')
+    print('Fitxer KML generat correctament.')
 
     print('LONG DISTANCE ARRIVALS')
     long = LongDistanceArrivals(aircrafts)
-    print('Vuelos de larga distancia:', len(long))
+    print('Vols de llarga distància:', len(long))
