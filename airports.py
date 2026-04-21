@@ -1,3 +1,5 @@
+from tkinter import filedialog
+
 class Airport:
     def __init__(self, code, latitude, longitude):
         self.code = code
@@ -36,7 +38,7 @@ def PrintAirport(airport):
 def LoadAirport(archivo_entrada):
     airports_list=[]
     try:
-        F=open(archivo_entrada, "r")    #Abrir archivo
+        F=open(archivo_entrada, "r")    #Obrir arxiu
         header=F.readline()
         linea=F.readline()
         while linea!="":
@@ -89,7 +91,7 @@ def LoadAirport(archivo_entrada):
     return airports_list
 
 
-# Guarde schengen en arxiu
+# Guarde schengen en arxiugg
 def SaveSchengenAirports(airports, archivo_salida):
     try:
         F=open(archivo_salida, "w")
@@ -130,8 +132,18 @@ def PlotAirports(airports):
 
 # Fa mapa d'aeroports
 def MapAirports(airports):
+    filepath = filedialog.asksaveasfilename(
+        defaultextension=".kml",
+        filetypes=[("KML files", "*.kml"), ("All files", "*.*")],
+        initialfile="Airp_map.kml",
+        title="Desa el mapa d'aeroports"
+    )
 
-    F = open('Airp_map.kml', 'w')
+    # Si l'usuari tanca el diàleg sense escollir, filepath és ""
+    if not filepath:
+        return False
+
+    F = open(filepath, 'w')
 
     # Escriu el format del kml per google earth
     F.write('<?xml version="1.0" encoding="UTF-8"?>\n')
@@ -174,3 +186,12 @@ def MapAirports(airports):
     F.write('</kml>\n')
 
     F.close()
+    return True
+
+def RemoveAirport(airports, code):
+    for airport in airports:
+        if airport.code == code:
+            airports.remove(airport)
+            print("Airport " + code + " removed.")
+            return
+    print("Error: airport " + code + " not found.")
