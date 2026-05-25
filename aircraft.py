@@ -107,7 +107,7 @@ def PlotAirlines(aircrafts):
     fig, ax = plt.subplots(figsize=(max(10, len(companies) * 0.7), 6))
     bars = ax.bar(range(len(companies)), counts, color='steelblue', edgecolor='white', width=0.6)
 
-    # Etiquetes inclinades 45° per evitar col·lisions
+    # Etiquetes inclinades 45° pq es pugui llegir bé
     ax.set_xticks(range(len(companies)))
     ax.set_xticklabels(companies, rotation=45, ha='right', fontsize=8)
 
@@ -117,9 +117,9 @@ def PlotAirlines(aircrafts):
                 bar.get_height() + 0.2,
                 str(val), ha='center', va='bottom', fontsize=7)
 
-    ax.set_xlabel('Aerolinea')
+    ax.set_xlabel('Aerolínea')
     ax.set_ylabel('Vols')
-    ax.set_title('Vols per aerolinea')
+    ax.set_title('Vols per aerolínea')
     ax.grid(axis='y', linestyle='--', alpha=0.4)
     fig.tight_layout()
     plt.show()
@@ -153,39 +153,37 @@ def PlotFlightsType(aircrafts):
     plt.show()
 
 
-def MapFlights(aircrafts):
-    f = open('Flight_map.kml', 'w')
+def MapFlights(aircrafts, filepath='Flight_map.kml'):
+    f = open(filepath, 'w')
 
     f.write('<?xml version="1.0" encoding="UTF-8"?>\n')
     f.write('<kml xmlns="http://www.opengis.net/kml/2.2">\n')
     f.write('<Document>\n')
 
-    #Vuelos Schengen (verde)
+    #Vols Schengen (verd)
     f.write('<Style id="Schengen">\n')
     f.write('  <LineStyle>\n')
     f.write('    <color>ff00ff00</color>\n')
     f.write('  </LineStyle>\n')
     f.write('</Style>\n')
 
-    #Vuelos NoSchengen (rojo)
+    #Vols NoSchengen (vermell)
     f.write('<Style id="NoSchengen">\n')
     f.write('  <LineStyle>\n')
     f.write('    <color>ff0000ff</color>\n')
     f.write('  </LineStyle>\n')
     f.write('</Style>\n')
 
-    #Coordenadas LEBL
+    #Coordenades LEBL
     lebl_lon = 2.07833
     lelb_lat = 41.29694
 
-    #Buscar el aeropuerto origen en la lista de aeropuertos
     airports = LoadAirport('Airports.txt')
 
     num=0
     while num < len(aircrafts):
         a = aircrafts[num]
 
-        #Buscar las coordenadas del aeropuerto origen
         origin_lat = 0.0
         origin_lon = 0.0
         i = 0
@@ -197,7 +195,6 @@ def MapFlights(aircrafts):
                 Found = True
             i = i+1
 
-        #Dibujar la línea
         f.write('<Placemark>\n')
         f.write('  <name>' + a.id + '</name>\n')
         if IsSchengenAirport(a.origin):
@@ -217,6 +214,7 @@ def MapFlights(aircrafts):
     f.write('</Document>\n')
     f.write('</kml>\n')
     f.close()
+    return filepath
 
 
 def Haversine(lat1, lon1, lat2, lon2):
@@ -238,7 +236,7 @@ def Haversine(lat1, lon1, lat2, lon2):
     return r * c
 
 def LongDistanceArrivals(aircrafts):
-    #Coordenadas LEBL (BCN)
+    #Coordenades LEBL (BCN)
     lebl_lat = 41.29694
     lebl_lon = 2.07833
 
@@ -249,7 +247,7 @@ def LongDistanceArrivals(aircrafts):
     while num < len(aircrafts):
         a = aircrafts[num]
 
-        #Buscar coordenadas d'aeroport d'origen'
+        #Buscar coordenades d'aeroport d'origen
         i=0
         while i < len(airports):
             if airports[i].code == a.origin:
@@ -263,29 +261,34 @@ def LongDistanceArrivals(aircrafts):
     return long_distance
 
 
-
 #TEST
+
 if __name__ == '__main__':
     aircrafts = LoadArrivals('Arrivals.txt')
-    print('Vols carregats:', len(aircrafts))
+    print('✔ Vols carregats:', len(aircrafts))
 
     print('TEST PLOT ARRIVALS')
     PlotArrivals(aircrafts)
+    print('✔')
+
 
     print('TEST SAVE FLIGHTS')
     SaveFlights(aircrafts, 'arrivals_output.txt')
-    print('Fitxer guardat correctament.')
+    print('✔ Fitxer guardat correctament.')
 
     print('TEST PLOT AIRLINES')
     PlotAirlines(aircrafts)
+    print('✔')
 
     print('TEST PLOT FLIGHTS TYPE')
     PlotFlightsType(aircrafts)
+    print('✔')
+
 
     print('TEST MAP FLIGHTS')
     MapFlights(aircrafts)
-    print('Fitxer KML generat correctament.')
+    print('✔ Fitxer KML generat correctament.')
 
     print('LONG DISTANCE ARRIVALS')
     long = LongDistanceArrivals(aircrafts)
-    print('Vols de llarga distància:', len(long))
+    print('✔ Vols de llarga distància:', len(long))

@@ -91,7 +91,7 @@ def LoadAirport(archivo_entrada):
     return airports_list
 
 
-# Guarde schengen en arxiugg
+# Guarda schengen en arxiu
 def SaveSchengenAirports(airports, archivo_salida):
     try:
         F=open(archivo_salida, "w")
@@ -141,7 +141,7 @@ def MapAirports(airports):
 
     # Si l'usuari tanca el diàleg sense escollir, filepath és ""
     if not filepath:
-        return False
+        return None
 
     F = open(filepath, 'w')
 
@@ -164,7 +164,7 @@ def MapAirports(airports):
     F.write('  </IconStyle>\n')
     F.write('</Style>\n')
 
-    # Un punto por cada aeropuerto
+    # Un punt per cada aeroport
     for airport in airports:
         F.write('<Placemark>\n')
         F.write('  <name>' + airport.code + '</name>\n')
@@ -181,12 +181,12 @@ def MapAirports(airports):
         F.write('  </Point>\n')
         F.write('</Placemark>\n')
 
-    # Cierre del archivo KML
+    # Tanca arxiu KML
     F.write('</Document>\n')
     F.write('</kml>\n')
 
     F.close()
-    return True
+    return filepath
 
 def RemoveAirport(airports, code):
     for airport in airports:
