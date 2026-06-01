@@ -1,4 +1,5 @@
 from airports import *
+from LEBL import *
 
 class Aircraft:
     def __init__(self, id, company, origin, timelanding):
@@ -10,29 +11,51 @@ class Aircraft:
         self.timedeparture = ''             # departure time, e.g. "14:50" ('' if no departure)
 
 
-# ═══════════════════════════════════════════════════
 #  V1 / V2 functions
-# ═══════════════════════════════════════════════════
 
 def LoadArrivals(filename):
     arrivals_list = []
     try:
         f = open(filename, "r")
-        header = f.readline()
-        linea = f.readline()
-        while linea != '':
-            elementos = linea.split()
-            if len(elementos) == 4:
-                id          = elementos[0]
-                company     = elementos[3]
-                origin      = elementos[1]
-                timelanding = elementos[2]
-                aircraft = Aircraft(id, company, origin, timelanding)
-                arrivals_list.append(aircraft)
-            linea = f.readline()
+        header = f.readline()  #We read the first line to skip it
+
+        line = f.readline()
+        while line != '':
+            items = line.split()
+
+            #We check if there are 4 items in the line
+            if len(items) == 4:
+                id = items[0]
+                origin = items[1]
+                timelanding = items[2]
+                company = items[3]
+
+                #Check if the airline has exactly 3 characters
+                if len(company) == 3:
+
+                    #Split the time with ':'
+                    time_parts = timelanding.split(':')
+                    if len(time_parts) == 2:
+                        hours = time_parts[0]
+
+                        #Check if the hours have 2 characters
+                        if len(hours) == 2:
+                            try:
+                                #Check if it's a whole number
+                                int(hours)
+
+                                #Add the aircraft
+                                aircraft = Aircraft(id, company, origin, timelanding)
+                                arrivals_list.append(aircraft)
+
+                            except ValueError:
+                                #If int(hours) fails, print a debug message and skip the line
+                                print("Warning: Invalid time format, skipping line.") #If int(hours) fails, print a debug message and skip the line
+
+            line = f.readline()
         f.close()
     except FileNotFoundError:
-        print('Error: archivo no encontrado.')
+        print('Error: file not found.')
     return arrivals_list
 
 
@@ -40,28 +63,28 @@ def PlotArrivals(aircrafts):
     import matplotlib.pyplot as plt
 
     if len(aircrafts) == 0:
-        print('Error: lista vacía.')
+        print('Error: empty list.')
         return
 
-    horas = [0] * 24
+    hours = [0] * 24
     i = 0
     while i < len(aircrafts):
-        tiempo = aircrafts[i].timelanding
-        partes = tiempo.split(':')
-        hora = int(partes[0])
-        horas[hora] = horas[hora] + 1
+        time = aircrafts[i].timelanding
+        parts = time.split(':')
+        hour = int(parts[0])
+        hours[hour] = hours[hour] + 1
         i = i + 1
 
-    plt.bar(range(24), horas)
-    plt.xlabel('Hora')
-    plt.ylabel('Vols')
-    plt.title('Arribades per hora')
+    plt.bar(range(24), hours)
+    plt.xlabel('Hour')
+    plt.ylabel('Flights')
+    plt.title('Arrivals per hour')
     plt.show()
 
 
 def SaveFlights(aircrafts, filename):
     if len(aircrafts) == 0:
-        print('Error: llista buida.')
+        print('Error: empty list.')
         return
 
     f = open(filename, "w")
@@ -78,7 +101,7 @@ def PlotAirlines(aircrafts):
     import matplotlib.pyplot as plt
 
     if len(aircrafts) == 0:
-        print('Error: llista buida.')
+        print('Error: empty list.')
         return
 
     companies = []
@@ -87,14 +110,14 @@ def PlotAirlines(aircrafts):
     while num < len(aircrafts):
         a       = aircrafts[num]
         company = a.company
-        encontrado = False
+        found = False
         i = 0
-        while i < len(companies) and not encontrado:
+        while i < len(companies) and not found:
             if companies[i] == company:
                 counts[i] = counts[i] + 1
-                encontrado = True
+                found = True
             i = i + 1
-        if not encontrado:
+        if not found:
             companies.append(company)
             counts.append(1)
         num = num + 1
@@ -110,9 +133,9 @@ def PlotAirlines(aircrafts):
         ax.text(bar.get_x() + bar.get_width() / 2,
                 bar.get_height() + 0.2,
                 str(val), ha='center', va='bottom', fontsize=7)
-    ax.set_xlabel('Aerolínea')
-    ax.set_ylabel('Vols')
-    ax.set_title('Vols per aerolínea')
+    ax.set_xlabel('Airline')
+    ax.set_ylabel('Flights')
+    ax.set_title('Flights per airline')
     ax.grid(axis='y', linestyle='--', alpha=0.4)
     fig.tight_layout()
     plt.show()
@@ -122,7 +145,7 @@ def PlotFlightsType(aircrafts):
     import matplotlib.pyplot as plt
 
     if len(aircrafts) == 0:
-        print('Error: llista buida.')
+        print('Error: empty list.')
         return
 
     Schengen   = 0
@@ -138,8 +161,8 @@ def PlotFlightsType(aircrafts):
 
     plt.bar(0, Schengen,   color='blue', label='Schengen')
     plt.bar(0, NoSchengen, bottom=Schengen, color='red', label='No Schengen')
-    plt.title('Vols Schengen vs No Schengen')
-    plt.ylabel('Vols')
+    plt.title('Schengen vs No Schengen flights')
+    plt.ylabel('Flights')
     plt.xticks([])
     plt.legend()
     plt.show()
@@ -159,7 +182,7 @@ def MapFlights(aircrafts, filepath='Flight_map.kml'):
 
     lebl_lon  = 2.07833
     lebl_lat  = 41.29694
-    airports  = LoadAirport('Airports.txt')
+    airports  = LoadAirports('Airports.txt')
 
     num = 0
     while num < len(aircrafts):
@@ -167,12 +190,12 @@ def MapFlights(aircrafts, filepath='Flight_map.kml'):
         origin_lat = 0.0
         origin_lon = 0.0
         i = 0
-        Found = False
-        while i < len(airports) and not Found:
+        found = False
+        while i < len(airports) and not found:
             if airports[i].code == a.origin:
                 origin_lat = airports[i].latitude
                 origin_lon = airports[i].longitude
-                Found = True
+                found = True
             i = i + 1
         f.write('<Placemark>\n')
         f.write('  <name>' + a.id + '</name>\n')
@@ -212,7 +235,7 @@ def Haversine(lat1, lon1, lat2, lon2):
 def LongDistanceArrivals(aircrafts):
     lebl_lat  = 41.29694
     lebl_lon  = 2.07833
-    airports  = LoadAirport('Airports.txt')
+    airports  = LoadAirports('Airports.txt')
     long_distance = []
     num = 0
     while num < len(aircrafts):
@@ -230,54 +253,69 @@ def LongDistanceArrivals(aircrafts):
     return long_distance
 
 
-# ═══════════════════════════════════════════════════
 #  V4 functions
-# ═══════════════════════════════════════════════════
 
+#Open departure file and return a list of aircraft with only the departure fields filled in
 def LoadDepartures(filename):
-    '''
-    Opens the departures file and returns a list of Aircraft with only
-    the departure fields filled in (destination, timedeparture, company, id).
-    Format:  AIRCRAFT  DESTINATION  DEPARTURE  AIRLINE
-    Returns an empty list if the file does not exist.
-    '''
     departures_list = []
     try:
         f = open(filename, "r")
-        header = f.readline()
-        linea  = f.readline()
-        while linea != '':
-            elementos = linea.split()
-            if len(elementos) == 4:
-                ac = Aircraft(elementos[0], elementos[3], '', '')
-                ac.destination   = elementos[1]
-                ac.timedeparture = elementos[2]
-                departures_list.append(ac)
-            linea = f.readline()
+        header = f.readline()  #Read the first line gto skip it
+
+        line = f.readline()
+        while line != '':
+            items = line.split()
+
+            #Check that there are 4 items in the line
+            if len(items) == 4:
+                id = items[0]
+                destination = items[1]
+                timedeparture = items[2]
+                company = items[3]
+
+                #Airline with exactly 3 characters
+                if len(company) == 3:
+
+                    #Split the time
+                    time_parts = timedeparture.split(':')
+                    if len(time_parts) == 2:
+                        hours = time_parts[0]
+
+                        #Hours with 2 characters
+                        if len(hours) == 2:
+                            try:
+                                #Whole number
+                                int(hours)
+
+                                #Add the aircraft
+                                ac = Aircraft(id, company, '', '')
+                                ac.destination = destination
+                                ac.timedeparture = timedeparture
+                                departures_list.append(ac)
+
+                            except ValueError:
+                                # If int(hours) fails, print a debug message and skip the line
+                                print("Warning: Invalid time format, skipping line.")
+
+            line = f.readline()
         f.close()
     except FileNotFoundError:
-        print('Error: archivo de salidas no encontrado.')
+        print('Error: output file not found.')
     return departures_list
 
 
+#Convert time to total minutes
 def _time_to_minutes(t):
-    '''Helper: converts "hh:mm" or "h:mm" to total minutes. Returns -1 on error.'''
     try:
         parts = t.split(':')
         return int(parts[0]) * 60 + int(parts[1])
-    except (ValueError, IndexError, AttributeError):
+    except (ValueError):
         return -1
 
 
+#Receives arrivals and departure lists and returns a merged list
 def MergeMovements(arrivals, departures):
-    '''
-    Receives two lists (arrivals and departures) and returns a merged list.
-    - Aircraft that appear in both lists with compatible times
-      (arrival before departure, same id) are merged into one Aircraft.
-    - Aircraft only in arrivals are kept as-is.
-    - Aircraft only in departures (night aircraft) are kept as-is.
-    Returns -1 if both lists are empty.
-    '''
+
     if len(arrivals) == 0 and len(departures) == 0:
         return -1
 
@@ -312,7 +350,6 @@ def MergeMovements(arrivals, departures):
                         ac.destination   = dep.destination
                         ac.timedeparture = dep.timedeparture
                         matched = True
-                        break
             m = m + 1
 
         # No matching arrival found → night aircraft, add as departure-only
@@ -327,12 +364,8 @@ def MergeMovements(arrivals, departures):
     return merged
 
 
+#Returns a list of aircrafts that have NO arrival but DO have a departure
 def NightAircraft(aircrafts):
-    '''
-    Returns a list of aircraft that have NO arrival (timelanding == '')
-    but DO have a departure. These are aircraft that spent the night at LEBL.
-    Returns -1 if the input list is empty.
-    '''
     if len(aircrafts) == 0:
         return -1
 
@@ -346,12 +379,8 @@ def NightAircraft(aircrafts):
     return night
 
 
+#Assigns a gate to each night aircraft
 def AssignNightGates(bcn, aircrafts):
-    '''
-    Assigns a gate to each night aircraft (departure-only).
-    Skips any aircraft that has arrival data.
-    Returns -1 if the list is empty.
-    '''
     if len(aircrafts) == 0:
         return -1
 
@@ -364,11 +393,8 @@ def AssignNightGates(bcn, aircrafts):
     return 0
 
 
+#Set the gate occupied by the aircraft to free
 def FreeGate(bcn, id):
-    '''
-    Finds the gate occupied by the aircraft with the given id
-    and sets it to free. Returns -1 if not found.
-    '''
     t = 0
     while t < len(bcn.Terminals):
         terminal = bcn.Terminals[t]
@@ -388,17 +414,12 @@ def FreeGate(bcn, id):
     return -1
 
 
+#Update bcn for the one-hour period
 def AssignGatesAtTime(bcn, aircrafts, time):
-    '''
-    Updates bcn for the one-hour period starting at 'time' (format "hh:mm").
-    1. Frees gates of aircraft that have already departed before 'time'.
-    2. Assigns gates to aircraft landing during [time, time+1h).
-    Returns the number of arriving aircraft that could not be assigned a gate.
-    '''
     start_min = _time_to_minutes(time)
     end_min   = start_min + 60
 
-    # Step 1 – free gates of aircraft that departed before start_min
+    #Free gates of aircraft that departed before start_min
     i = 0
     while i < len(aircrafts):
         ac = aircrafts[i]
@@ -408,7 +429,7 @@ def AssignGatesAtTime(bcn, aircrafts, time):
                 FreeGate(bcn, ac.id)
         i = i + 1
 
-    # Step 2 – assign gates to aircraft landing in [start_min, end_min)
+    #Assign gates to aircraft landing in [start_min, end_min)
     unassigned = 0
     i = 0
     while i < len(aircrafts):
@@ -424,16 +445,12 @@ def AssignGatesAtTime(bcn, aircrafts, time):
     return unassigned
 
 
+#Returns a graph with the nuumber of occupancy for each hour of the day plus the number unassigned aircraft per hour
 def PlotDayOccupancy(bcn, aircrafts):
-    '''
-    Returns a matplotlib figure with the number of occupied gates per terminal
-    for each hour of the day, plus the number of unassigned aircraft per hour.
-    NOTE: bcn should be passed as a deepcopy so the live state is not mutated.
-    '''
     import matplotlib.pyplot as plt
     import copy
 
-    # Count terminal names
+    #Count terminal names
     terminal_names = []
     t = 0
     while t < len(bcn.Terminals):
@@ -447,7 +464,7 @@ def PlotDayOccupancy(bcn, aircrafts):
     h = 0
     while h < 24:
         time_str = str(h).zfill(2) + ':00'
-        # Deep copy per hour so each hour starts from the same state
+        #Deep copy per hour so each hour starts from the same state
         bcn_copy = copy.deepcopy(bcn)
         unasgn   = AssignGatesAtTime(bcn_copy, aircrafts, time_str)
         unassigned_h.append(unasgn)
@@ -471,7 +488,7 @@ def PlotDayOccupancy(bcn, aircrafts):
         occupied.append(counts)
         h = h + 1
 
-    # Build stacked bar chart
+    #Build stacked bar chart
     fig, ax1 = plt.subplots(figsize=(14, 6))
 
     colors = ['#3A7FC1', '#D9704A', '#2ECC71', '#9B59B6']
@@ -508,12 +525,12 @@ def PlotDayOccupancy(bcn, aircrafts):
     ax2.legend(loc='upper right')
 
     fig.tight_layout()
-    return fig          # ← returned so the GUI can embed it in the panel
+    return fig          #returned so the GUI can embed it in the panel
 
 
-# ═══════════════════════════════════════════════════
+
 #  TEST
-# ═══════════════════════════════════════════════════
+
 
 if __name__ == '__main__':
     arrivals = LoadArrivals('Arrivals.txt')

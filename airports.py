@@ -7,7 +7,7 @@ class Airport:
         self.longitude = longitude
         self.isSchengen = False
 
-# Mira si l'aeroport és Schengen
+# Checks if the airport is within the Schengen Area
 def IsSchengenAirport(code):
     if not code or len(code)<2:
         return False
@@ -18,7 +18,7 @@ def IsSchengenAirport(code):
     else:
         return False
 
-# Rep si és schengen o no i diu si és true o false
+# Receives the Schengen status and updates the boolean to True or False
 def SetSchengen(airport):
     result=IsSchengenAirport(airport.code)
     if result == True:
@@ -26,76 +26,81 @@ def SetSchengen(airport):
     else:
         airport.isSchengen=False
 
-# Fica en la consola aeroport
+# Prints the airport details to the console
 def PrintAirport(airport):
-    print("Dades de l'aeroport:")
-    print("Codi ICAO:", airport.code)
+    print("Airport data:")
+    print("ICAO code:", airport.code)
     print("Latitude:", airport.latitude)
     print("Longitude:", airport.longitude)
     print("Schengen:", airport.isSchengen)
 
 
-def LoadAirport(archivo_entrada):
-    airports_list=[]
+def LoadAirports(filename):
+    airports_list = []
     try:
-        F=open(archivo_entrada, "r")    #Obrir arxiu
-        header=F.readline()
-        linea=F.readline()
-        while linea!="":
-            elementos = linea.split()
-            if len(elementos)>=3:
-                # Codi aeroport
-                code=elementos[0]
-                letras=code.split()
-                country=letras[0:1]
+        F = open(filename, "r")
+        header = F.readline()  #Reads the first line to skip it
 
-                #Convertir latitud
-                lat=elementos[1]
-                #Extraure els trossos
-                lat_grados=float(lat[1:3])
-                lat_min=float(lat[3:5])
-                lat_seg=float(lat[5:7])
+        line = F.readline()
+        while line != '':
+            items = line.split()
 
-                lat_decimal=lat_grados+lat_min/60+lat_seg/3600
-                if lat[0]=="S":           #Si és sud la latitud és negativa
-                    lat_decimal=-lat_decimal
+            #Chech that the line has 3 items (CODE, LAT, LON)
+            if len(items) == 3:
+                #Airport code
+                code = items[0]
+                letters = code.split()
+                country = letters[0:1]
 
-                #Convertir longitud
-                lon=elementos[2]
+                #Convert latitude
+                lat = items[1]
+                #Extract the pieces
+                lat_deg = float(lat[1:3])
+                lat_min = float(lat[3:5])
+                lat_seg = float(lat[5:7])
 
-                lon_grados=float(lon[1:4])
-                lon_min=float(lon[4:6])
-                lon_seg=float(lon[6:8])
+                lat_decimal = lat_deg + lat_min/60 + lat_seg/3600
+                if lat[0] == "S":           #If it south, the latitude is negative
+                    lat_decimal = -lat_decimal
 
-                lon_decimal=lon_grados+lon_min/60+lon_seg/3600
-                if lon[0]=="W":       #Si és oest (west) la longitud és negativa
-                    lon_decimal=-lon_decimal
+                #Convert longitude
+                lon = items[2]
 
-                    #Crear aeroport
-            airport = Airport(code, lat_decimal, lon_decimal)
+                lon_deg = float(lon[1:4])
+                lon_min = float(lon[4:6])
+                lon_seg = float(lon[6:8])
 
-                    # Asignar Schengen
-            SetSchengen(airport)
+                lon_decimal = lon_deg + lon_min/60 + lon_seg/3600
+                if lon[0] == "W":       #If it's west, the longitude si negative
+                    lon_decimal = -lon_decimal
 
-                    # Afegir a la llista
-            airports_list.append(airport)
+                #Create airport
+                airport = Airport(code, lat_decimal, lon_decimal)
 
-            linea = F.readline()
+                # Assign Schengen
+                SetSchengen(airport)
+
+                # Add to the list
+                airports_list.append(airport)
+                # -----------------------------------------------
+
+            line = F.readline()
 
         F.close()
 
-    except FileNotFoundError:
-        print("Error: arxiu no trobat.")
 
+    except FileNotFoundError:
+
+        print("Error: file not found.")
 
     return airports_list
 
 
-# Guarda schengen en arxiu
-def SaveSchengenAirports(airports, archivo_salida):
+#Saves Schengen in file
+def SaveSchengenAirports(airports, output_file):
     try:
-        F=open(archivo_salida, "w")
-        F.write('SHENGEN AIRPORTS (CODE LATITUDE LONGITUDE):\n')
+        F=open(output_file, "w")
+        F.write('SCHENGEN AIRPORTS (CODE LATITUDE LONGITUDE):\n')
 
         for airport in airports:
             if airport.isSchengen:
@@ -104,10 +109,10 @@ def SaveSchengenAirports(airports, archivo_salida):
         F.close()
 
     except:
-        print("Error al guardar l'arxiu.")
+        print("Error saving file.")
 
 
-# Fa la grafica dels aeroports
+#Airports graphic
 def PlotAirports(airports):
     import matplotlib.pyplot as plt
 
@@ -130,7 +135,7 @@ def PlotAirports(airports):
     plt.legend()
     plt.show()
 
-# Fa mapa d'aeroports
+#Airports map
 def MapAirports(airports):
     filepath = filedialog.asksaveasfilename(
         defaultextension=".kml",
@@ -139,32 +144,32 @@ def MapAirports(airports):
         title="Desa el mapa d'aeroports"
     )
 
-    # Si l'usuari tanca el diàleg sense escollir, filepath és ""
+    #If the user closes the dialog without making a choice, filepath is ""
     if not filepath:
         return None
 
     F = open(filepath, 'w')
 
-    # Escriu el format del kml per google earth
+    #Write the KML format for Google Earth
     F.write('<?xml version="1.0" encoding="UTF-8"?>\n')
     F.write('<kml xmlns="http://www.opengis.net/kml/2.2"\n>')
     F.write('<Document>')
 
-    # Estil airp Schengen (Verd)
+    #Schengen airport style (green)
     F.write('<Style id="schengen">\n')
     F.write('  <IconStyle>\n')
     F.write('    <color>ff00ff00</color>\n')
     F.write('  </IconStyle>\n')
     F.write('</Style>\n')
 
-    # Estil airp NO Schengen (vermell)
+    #Non Schengen airport style (red)
     F.write('<Style id="no_schengen">\n')
     F.write('  <IconStyle>\n')
     F.write('    <color>ff0000ff</color>\n')
     F.write('  </IconStyle>\n')
     F.write('</Style>\n')
 
-    # Un punt per cada aeroport
+    #One placemark point each airport
     for airport in airports:
         F.write('<Placemark>\n')
         F.write('  <name>' + airport.code + '</name>\n')
@@ -188,10 +193,33 @@ def MapAirports(airports):
     F.close()
     return filepath
 
+#Adds an airport to the list if the code isn't previously there
+def AddAirport(airports_list, code, latitude, longitude):
+
+    #Check if the airport already exists in the list to avoid duplicating it
+    for ap in airports_list:
+        if ap.code == code:
+            print('The airport',code, 'already exists.')
+            return -1  #If it already exists
+
+    #Create the new airport instance
+    new_airport = Airport(code, latitude, longitude)
+
+    #Assign or not Schengen Area
+    SetSchengen(new_airport)
+
+    #Add it to the general list
+    airports_list.append(new_airport)
+    print('The airport',code,'has been added successfully.')
+    return 0
+
+#Removes an airport from the list based on its ICAO code
 def RemoveAirport(airports, code):
+    #Look for the airport with the matching ICAO code
     for airport in airports:
         if airport.code == code:
+            #Remove the airport after finding it
             airports.remove(airport)
-            print("Airport " + code + " removed.")
+            print('Airport ', code, 'removed.')
             return
-    print("Error: airport " + code + " not found.")
+    print("Error: airport " , code , " not found.")

@@ -2,9 +2,7 @@ from aircraft import *
 from airports import *
 
 
-# ─────────────────────────────────────────────
 #  Classes
-# ─────────────────────────────────────────────
 
 class Gate:
     def __init__(self):
@@ -15,14 +13,14 @@ class Gate:
 
 class BoardingArea:
     def __init__(self):
-        self.area     = ""     # letter, e.g. "A"
+        self.area     = ""     # letter
         self.schengen = False  # True = Schengen, False = non-Schengen
         self.gates    = []
 
 
 class Terminal:
     def __init__(self):
-        self.number        = ""   # e.g. "T1"
+        self.number        = ""
         self.BoardingAreas = []
         self.airlines      = []   # list of (airline_name, ICAO_code)
 
@@ -33,15 +31,10 @@ class BarcelonaAP:
         self.Terminals    = []
 
 
-# ─────────────────────────────────────────────
 #  Functions
-# ─────────────────────────────────────────────
 
+#Fills area.gates with Gate objects
 def SetGates(area, init_gate, end_gate, prefix):
-    """
-    Fills area.gates with Gate objects named prefix+number.
-    Returns -1 if end_gate <= init_gate (invalid range).
-    """
     if end_gate <= init_gate:
         return -1
     area.gates = []
@@ -55,12 +48,8 @@ def SetGates(area, init_gate, end_gate, prefix):
         i = i + 1
 
 
+#Reads Airlines.txt and fills terminal.airlines
 def LoadAirlines(terminal, t_name):
-    """
-    Reads {t_name}_Airlines.txt and fills terminal.airlines.
-    Each line: "Airline Name<TAB>ICAO_code"
-    Returns -1 if file does not exist.
-    """
     filename = t_name + "_Airlines.txt"
     try:
         f = open(filename, "r")
@@ -77,11 +66,8 @@ def LoadAirlines(terminal, t_name):
     f.close()
 
 
+#Reads Terminals.txt style file and builds a BarcelonaAP object
 def LoadAirportStructure(filename):
-    """
-    Reads a Terminals.txt-style file and builds a BarcelonaAP object.
-    Returns -1 if file does not exist.
-    """
     try:
         f = open(filename, "r")
     except OSError:
@@ -93,7 +79,7 @@ def LoadAirportStructure(filename):
     bcn = BarcelonaAP()
     i   = 0
 
-    # First line: airport name
+    #First line: airport name
     first = lines[i].split()
     bcn.CompleteName = first[0]
     i = i + 1
@@ -135,11 +121,8 @@ def LoadAirportStructure(filename):
     return bcn
 
 
+#Returns a list of tuples for every gate in the airport
 def GateOccupancy(bcn):
-    """
-    Returns a list of tuples (gate_name, occupied_bool, aircraft_id)
-    for every gate in the airport.
-    """
     result = []
     for terminal in bcn.Terminals:
         for ba in terminal.BoardingAreas:
@@ -148,12 +131,8 @@ def GateOccupancy(bcn):
     return result
 
 
+#Checks if airline is in the terminal
 def IsAirlineInTerminal(terminal, name):
-    """
-    Returns True if airline 'name' (name or ICAO) is in the terminal.
-    Returns (False, -1) if name is empty.
-    Returns False if list is empty or airline not found.
-    """
     if name == "":
         return False, -1
     if len(terminal.airlines) == 0:
@@ -164,23 +143,16 @@ def IsAirlineInTerminal(terminal, name):
     return False
 
 
+#Returns the terminal name where airline boards
 def SearchTerminal(bcn, name):
-    """
-    Returns the terminal name (e.g. "T1") where airline 'name' boards.
-    Returns "" if not found.
-    """
     for terminal in bcn.Terminals:
         if IsAirlineInTerminal(terminal, name) == True:
             return terminal.number
     return ""
 
 
+#Assigns the first free gate in the correct terminal and Schengen/non-Schengen Area to the aircraft
 def AssignGate(bcn, aircraft):
-    """
-    Assigns the first free gate in the correct terminal and
-    Schengen/non-Schengen area to the aircraft. Updates bcn.
-    Returns -1 if no free gate is available.
-    """
     terminal_name = SearchTerminal(bcn, aircraft.company)
     is_schengen   = IsSchengenAirport(aircraft.origin)
 
@@ -196,16 +168,11 @@ def AssignGate(bcn, aircraft):
     return -1
 
 
-# ─────────────────────────────────────────────
-#  V4 functions
-# ─────────────────────────────────────────────
 
+#  V4 functions
+
+#Assigns a gate to each night aircraft
 def AssignNightGates(bcn, aircrafts):
-    """
-    Assigns a gate to each night aircraft (departure-only: no arrival time).
-    Skips aircraft that have arrival data.
-    Returns -1 if the list is empty.
-    """
     if len(aircrafts) == 0:
         print("Error: aircraft list is empty.")
         return -1
@@ -219,11 +186,8 @@ def AssignNightGates(bcn, aircrafts):
     return 0
 
 
+#Finds the gate occupied by the aircraft with the given id and sets it to free
 def FreeGate(bcn, id):
-    """
-    Finds the gate occupied by the aircraft with the given id
-    and sets it to free. Returns -1 if not found.
-    """
     t_idx = 0
     while t_idx < len(bcn.Terminals):
         terminal = bcn.Terminals[t_idx]
@@ -249,19 +213,14 @@ def FreeGate(bcn, id):
     return -1
 
 
+#Updates bcn for the one-hour period
 def AssignGatesAtTime(bcn, aircrafts, time):
-    """
-    Updates bcn for the one-hour period starting at 'time' (format "hh:mm").
-    1. Frees gates of aircraft that departed at this hour.
-    2. Assigns gates to aircraft landing during this hour.
-    Returns the number of arriving aircraft that could not be assigned a gate.
-    """
     parts_time      = time.split(':')
     simulation_hour = int(parts_time[0])
 
     unassigned = 0
 
-    # Step 1 – free gates of aircraft that departed at this hour
+    #Free gates of aircraft that departed at this hour
     t_idx = 0
     while t_idx < len(bcn.Terminals):
         terminal = bcn.Terminals[t_idx]
@@ -292,7 +251,7 @@ def AssignGatesAtTime(bcn, aircrafts, time):
             ba_idx = ba_idx + 1
         t_idx = t_idx + 1
 
-    # Step 2 – assign gates to aircraft landing this hour
+    #Assign gates to aircraft landing this hour
     a_idx = 0
     while a_idx < len(aircrafts):
         a = aircrafts[a_idx]
@@ -308,13 +267,8 @@ def AssignGatesAtTime(bcn, aircrafts, time):
     return unassigned
 
 
+#Builds and returns graph showing gate occupancy per terminal for each hour of the day
 def PlotDayOccupancy(bcn, aircrafts):
-    """
-    Builds and RETURNS a matplotlib figure showing gate occupancy per terminal
-    for each hour of the day, plus the number of unassigned aircraft per hour.
-    The caller is responsible for displaying or embedding the figure.
-    NOTE: bcn should be passed as a deepcopy so the live state is not mutated.
-    """
     import matplotlib.pyplot as plt
 
     if len(aircrafts) == 0:
@@ -331,11 +285,11 @@ def PlotDayOccupancy(bcn, aircrafts):
         time_str = str(h).zfill(2) + ':00'
         hours_axis.append(time_str)
 
-        # Run simulation for this hour
+        #Run simulation for this hour
         no_gate = AssignGatesAtTime(bcn, aircrafts, time_str)
         unassigned.append(no_gate)
 
-        # Count occupied gates per terminal
+        #Count occupied gates per terminal
         gates_t1 = 0
         gates_t2 = 0
 
@@ -364,7 +318,7 @@ def PlotDayOccupancy(bcn, aircrafts):
 
         h = h + 1
 
-    # Build the figure and return it (do NOT call plt.show())
+    #Build the figure and return it (do NOT call plt.show())
     fig, ax1 = plt.subplots(figsize=(10, 5))
 
     ax1.plot(range(24), occupancy_t1, color='#3A7FC1', linewidth=2, marker='o', label='T1 occupied gates')
@@ -383,12 +337,10 @@ def PlotDayOccupancy(bcn, aircrafts):
     ax2.legend(loc='upper right')
 
     fig.tight_layout()
-    return fig   # returned so interface.py can embed it with show_info_plot()
+    return fig   #returned so interface.py can embed it with show_info_plot()
 
 
-# ─────────────────────────────────────────────
-#  Test section
-# ─────────────────────────────────────────────
+#TEST SECTION
 
 if __name__ == "__main__":
 
