@@ -2277,7 +2277,7 @@ def view_ground_movements():
         return
 
     # 2. Pedir la matrícula
-    reg_input = sd.askstring("Ground Radar", "Enter Aircraft ID for Taxiing (e.g. VLG123):")
+    reg_input = sd.askstring("Ground Radar", "Enter Aircraft ID for Taxiing (e.g. ECLUN):")
     if not reg_input:
         return
     reg_input = reg_input.strip().upper()
@@ -2447,7 +2447,7 @@ def view_merged_flight():
         return
 
     # 2. Pedir la matrícula
-    reg_input = sd.askstring("Merged Flight", "Enter Aircraft Registration (ID, e.g. VLG123):")
+    reg_input = sd.askstring("Merged Flight", "Enter Aircraft Registration (ID, e.g. ECLUN):")
     if not reg_input:
         return
     reg_input = reg_input.strip().upper()
