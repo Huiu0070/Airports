@@ -3335,10 +3335,10 @@ section_label(left, "EXTRA FUNCTIONS")
 
 btn_row(left, [("Active Runways",     check_active_runways),
                ("Airport Map",        view_airport_map)])
-btn_row(left, [("View Arrival",       view_aircraft_arrival,  "#1A6B3C"),
-               ("Assign STARs",       assign_stars_to_arrivals,)])
-btn_row(left, [("View Departure",     view_aircraft_departure,  "#1A6B3C"),
-               ("Assign SIDs",        assign_sids_to_departures,)])
+btn_row(left, [("Assign STARs",       assign_stars_to_arrivals,),
+               ("View Arrival",       view_aircraft_arrival,  "#1A6B3C")])
+btn_row(left, [("Assign SIDs",        assign_sids_to_departures,),
+               ("View Departure",     view_aircraft_departure,  "#1A6B3C")])
 btn_row(left, [("Ground Taxiing",     view_ground_movements),
                ("View Merged Flight", view_merged_flight)])
 
