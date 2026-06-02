@@ -749,7 +749,7 @@ def ask_password():
     # --- Contenedor invisible para guardar el espacio del error ---
     msg_frame = tk.Frame(dialog, bg="white", height=45)
     msg_frame.pack(fill="x")
-    msg_frame.pack_propagate(False) # Evita que el contenedor encoja
+    msg_frame.pack_propagate(False)
 
     error_lbl = tk.Label(msg_frame, text="", bg="white", font=("Helvetica", 9), fg="red")
     error_lbl.pack()
@@ -939,7 +939,7 @@ def load_airports():
     # Comprovació d'error si és buit
     if len(airports) == 0:
         messagebox.showerror("Error",
-                             "No se ha podido cargar ningún aeropuerto. Comprueba que el archivo sea el correcto.")
+                             "No airport could be loaded. Make sure that the file is the correct one.")
         return
 
     refresh_airport_list()
@@ -968,7 +968,7 @@ def add_airport():
         refresh_airport_list()
         messagebox.showinfo("Done", "Airport " + code + " added.")
     except ValueError:
-        messagebox.showerror("Error", "Latitude and longitude must be valid numbers.")
+        messagebox.showerror("Error", "Latitude and Longitude must be valid numbers.")
     except TypeError:
         messagebox.showerror("Error", "Invalid type for latitude or longitude.")
     except AttributeError:
@@ -1057,7 +1057,7 @@ def load_arrivals():
 
     # Si la lista está vacía (0 vuelos), lanzamos ERROR y paramos
     if len(aircrafts) == 0:
-        messagebox.showerror("Error", "No se ha podido cargar ningún vuelo. Comprueba que el archivo sea el correcto.")
+        messagebox.showerror("Error", "No flight could be loaded. Make sure that the file is the correct one.")
         return
 
     refresh_flights_list()
@@ -1178,7 +1178,7 @@ def load_airport_structure():
 
         # 1. Si devuelve un código de error o está vacío, lanzamos un fallo voluntario
         if bcn == -1 or bcn is None:
-            raise Exception("Error de carga")
+            raise Exception("Upload Error")
 
         # 2. Comprobamos de forma segura si tiene terminales (soporta 'terminals' y 'Terminals')
         num_terminales = 0
@@ -1188,18 +1188,18 @@ def load_airport_structure():
             num_terminales = len(bcn.Terminals)
         else:
             # Si el objeto no tiene ningún atributo de terminales, está mal creado
-            raise Exception("Atributo no encontrado")
+            raise Exception("Atribute not found")
 
         # 3. Si al final el recuento da 0 terminales, lanzamos el fallo
         if num_terminales == 0:
-            raise Exception("0 terminales encontradas")
+            raise Exception("0 terminals found")
 
         # Si pasa todos los filtros con éxito, muestra el mensaje de confirmación
         messagebox.showinfo("Done", "Airport structure loaded successfully.")
 
     except Exception:
         # Si pasa CUALQUIER cosa mala dentro del 'try', venimos directamente aquí:
-        messagebox.showerror("Error", "No se ha podido cargar la estructura. Comprueba que el archivo sea el correcto.")
+        messagebox.showerror("Error", "No structure could not be loaded. Make sure that the file is the correct one.")
         bcn = None  # Reseteamos la variable para que no guarde dades corruptas
         return
 
@@ -1253,7 +1253,7 @@ def assign_dynamic_gates():
             if t.number != pref_t: continue
             for a in t.BoardingAreas:
                 for g in a.gates:
-                    # LA MAGIA: ¿Está libre en el momento en que llega este avión?
+                    # Comprobamos si está libre en el momento en que llega este avión
                     if getattr(g, 'free_at', 0) <= arr_mins:
                         g.id = ac.id
                         g.free_at = dep_mins + 15  # Se libera 15 mins tras el despegue
@@ -1329,7 +1329,7 @@ def load_departures():
     # Si la lista está vacía (0 vuelos), lanzamos ERROR y paramos
     if len(departures) == 0:
         messagebox.showerror("Error",
-                             "No se ha podido cargar ninguna salida. Comprueba que el archivo sea el correcto.")
+                             "No departure could be loaded. Make sure that the file is the correct one.")
         return
 
     lines = []
@@ -1353,8 +1353,7 @@ def merge_movements():
         return
     merged = result
 
-    # ¡SOLUCIÓN CRÍTICA!: Rescatamos el STAR y el SID de las listas originales
-    # ya que la función MergeMovements genera objetos nuevos y los pierde.
+    # Rescatamos el STAR y el SID de las listas originales ya que la función MergeMovements genera objetos nuevos y los pierde.
     for ac in merged:
         # Buscar el STAR original en las llegadas
         for a in aircrafts:
@@ -1548,7 +1547,7 @@ def show_interactive_diagram():
 
     canvas.bind("<Motion>", on_motion)
 
-    # Dibujamos el estado inicial (que ahora son los Night Gates)
+    # Dibujamos el estado inicial (que son los Night Gates)
     on_slider_move(0)
 
 
@@ -1566,46 +1565,46 @@ def check_active_runways(time_str=None):
     wind_dir = CURRENT_WIND_DIR
     wind_speed = CURRENT_WIND_SPEED
 
-    # 2. Evaluar si es de día o de noche
+    # 2. Evaluar si es de día o de noche (De las 23h a las 5:30h)
     is_night = False
     if h < 5 or (h == 5 and m <= 30) or h == 23:
         is_night = True
 
     # 3. Aplicar las reglas de El Prat
-    explicacion = "Condiciones estándar. No se aplican excepciones."
+    explicacion = "Standard conditions. No exceptions applied."
 
     if is_night:
         # Excepción Nocturna: Viento entre 150 y 330 + velocidad > 18.5 km/h
         if 150 <= wind_dir <= 330 and wind_speed > 18.5:
             arr_rw = "02"
             dep_rw = "24L"
-            mode = "Configuración Nocturna (ATÍPICA) 🌙💨"
-            explicacion = "⚠️ Cambio de configuración: Viento cruzado/cola fuerte."
+            mode = "Nighttime configuration (ATYPICAL) 🌙💨"
+            explicacion = "⚠️ Configuration change: Strong crosswind/tailwind."
         else:
             arr_rw = "02"
             dep_rw = "06R"
-            mode = "Configuración Nocturna Normal 🌙"
+            mode = "Standard nighttime configuration 🌙"
     else:
         # Excepción Diurna: Viento entre 330 y 150 (componente Norte/Este) + velocidad > 18.5
         if (wind_dir >= 330 or wind_dir <= 150) and wind_speed > 18.5:
             arr_rw = "06L"
             dep_rw = "06R"
-            mode = "Configuración Diurna Este (ATÍPICA) ☀️💨"
-            explicacion = "⚠️ Cambio a Configuración Este: Viento fuerte de componente Norte/Este."
+            mode = "East daytime configuration (ATYPICAL) ☀️💨"
+            explicacion = "⚠️ East configuration change: Strong wind coming from North/East."
         else:
             arr_rw = "24R"
             dep_rw = "24L"
-            mode = "Configuración Diurna Oeste (Normal) ☀️"
+            mode = "West daytime configuration (NORMAL) ☀️"
 
     # 4. Mostrar en pantalla
     lines = [
-        f"  Hora evaluada: {time_str}",
-        f"  🧭 METAR Local: Viento {wind_dir}º a {wind_speed} km/h",
-        f"  Modo operativo: {mode}",
+        f"  Time: {time_str}",
+        f"  🧭 Local METAR: Wind {wind_dir}º at {wind_speed} km/h",
+        f"  Operative mode: {mode}",
         f"  {explicacion}",
         "",
-        f"  🛬 Pistas de Aterrizaje:  {arr_rw}",
-        f"  🛫 Pistas de Despegue:    {dep_rw}"
+        f"  🛬 Landing Runway:  {arr_rw}",
+        f"  🛫 Takeoff Runway:    {dep_rw}"
     ]
 
     show_info_label("Active Runways Configuration", lines)
@@ -1615,7 +1614,7 @@ def assign_sids_to_departures():
         messagebox.showerror("Error", "Please, upload the Departures file first.")
         return
 
-    # Creamos una ventanita limpia para elegir la configuración activa
+    # Creamos una ventana limpia para elegir la configuración activa
     win = tk.Toplevel(root)
     win.title("Assign SID Routes")
     win.geometry("320x150")
@@ -1642,7 +1641,7 @@ def assign_sids_to_departures():
                 ac.sid = "DCT"
                 assigned_dct += 1
 
-        # 2. ¡SOLUCIÓN!: Asignamos también a la lista unificada (merged) si ya existe
+        # 2. Asignamos también a la lista unificada (merged) si ya existe
         if 'merged' in globals() and len(merged) > 0:
             for ac in merged:
                 if ac.destination:
@@ -1671,13 +1670,6 @@ def assign_sids_to_departures():
               bg="#3A7FC1", fg="white", relief="flat", width=12, font=("Helvetica", 9, "bold")).pack(side="left", padx=10)
     tk.Button(btn_frame, text="EAST (06R)", command=lambda: aplicar_sids("06R"),
               bg="#D9704A", fg="white", relief="flat", width=12, font=("Helvetica", 9, "bold")).pack(side="left", padx=10)
-
-
-import tkinter.simpledialog as sd
-from tkinter import messagebox
-
-import tkinter.simpledialog as sd
-from tkinter import messagebox
 
 
 def view_aircraft_departure():
@@ -1860,7 +1852,7 @@ def assign_stars_to_arrivals():
             company = getattr(ac, 'company', '')
             lines.append(f"  {timelanding:<6} {origen:<6} STAR: {star_asignada:<8} {company}")
 
-        # 2. ¡SOLUCIÓN!: Asignamos también a la lista unificada (merged) si ya existe
+        # 2. Asignamos también a la lista unificada (merged) si ya existe
         if 'merged' in globals() and len(merged) > 0:
             for ac in merged:
                 if ac.origin:
@@ -1949,11 +1941,11 @@ def view_aircraft_arrival():
 
         # --- 1. DIBUJAR MAPA BASE ---
         if 'draw_radar_base' in globals():
-            draw_radar_base(canvas, w, h) # ¡Sin argumentos inventados!
-
+            draw_radar_base(canvas, w, h)
+            
         cx_dest, cy_dest = get_radar_xy(41.29, 2.07, w, h)
 
-        # --- 1.5 DIBUJAR STARs EN SEGUNDO PLANO ---
+        # --- 1.1 DIBUJAR STARs EN SEGUNDO PLANO ---
         if 'STARS_DATA' in globals() and rwy in STARS_DATA:
             for star_name, ruta_bg in STARS_DATA[rwy].items():
                 if star_name != star:
